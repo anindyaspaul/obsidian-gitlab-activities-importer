@@ -32,7 +32,7 @@ Import your GitLab activities into the active daily note using the GitLab REST A
 3. In Obsidian, open **Settings → Community plugins → Obsidian GitLab Activities Importer**.
 4. Configure:
      - **GitLab base URL** (for example `https://gitlab.com`)
-     - **Personal access token**
+     - **Personal access token** with at `read_user` and `read_api` permissions.
      - Optional output heading and pagination limits
 
 ## Usage
