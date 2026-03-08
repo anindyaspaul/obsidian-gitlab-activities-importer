@@ -29,5 +29,6 @@ export interface GitlabActivityEvent {
 	createdAt: string;
 	projectId?: number;
 	projectName?: string;
+	projectWebUrl?: string;
 	pushData?: GitlabPushData;
 }

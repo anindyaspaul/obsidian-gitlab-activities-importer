@@ -83,7 +83,12 @@ function buildDayRange(dateText: string): { afterDate: string; beforeDate: strin
 	};
 }
 
-async function fetchProjectName(baseUrl: string, privateToken: string, projectId: number): Promise<string | undefined> {
+interface GitlabProjectInfo {
+	pathWithNamespace?: string;
+	webUrl?: string;
+}
+
+async function fetchProjectInfo(baseUrl: string, privateToken: string, projectId: number): Promise<GitlabProjectInfo> {
 	const projectUrl = `${baseUrl}/api/v4/projects/${encodeURIComponent(String(projectId))}`;
 
 	const projectResponse = await requestUrl({
@@ -96,7 +101,12 @@ async function fetchProjectName(baseUrl: string, privateToken: string, projectId
 
 	const payload = projectResponse.json as Record<string, unknown>;
 	const pathWithNamespace = payload.path_with_namespace;
-	return typeof pathWithNamespace === "string" ? pathWithNamespace : undefined;
+	const webUrl = payload.web_url;
+
+	return {
+		pathWithNamespace: typeof pathWithNamespace === "string" ? pathWithNamespace : undefined,
+		webUrl: typeof webUrl === "string" ? webUrl : undefined
+	};
 }
 
 async function enrichProjectNames(
@@ -112,20 +122,21 @@ async function enrichProjectNames(
 		return events;
 	}
 
-	const projectNameEntries = await Promise.all(uniqueProjectIds.map(async (projectId) => {
+	const projectInfoEntries = await Promise.all(uniqueProjectIds.map(async (projectId) => {
 		try {
-			const projectName = await fetchProjectName(baseUrl, privateToken, projectId);
-			return [projectId, projectName] as const;
+			const projectInfo = await fetchProjectInfo(baseUrl, privateToken, projectId);
+			return [projectId, projectInfo] as const;
 		} catch {
-			return [projectId, undefined] as const;
+			return [projectId, {}] as const;
 		}
 	}));
 
-	const projectNameById = new Map<number, string | undefined>(projectNameEntries);
+	const projectInfoById = new Map<number, GitlabProjectInfo>(projectInfoEntries);
 
 	return events.map(event => ({
 		...event,
-		projectName: event.projectId !== undefined ? projectNameById.get(event.projectId) : undefined
+		projectName: event.projectId !== undefined ? projectInfoById.get(event.projectId)?.pathWithNamespace : undefined,
+		projectWebUrl: event.projectId !== undefined ? projectInfoById.get(event.projectId)?.webUrl : undefined
 	}));
 }
 

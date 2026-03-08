@@ -23,13 +23,22 @@ function stripRefPrefix(ref: string): string {
 	return ref.replace(/^refs\/heads\//, "").replace(/^refs\/tags\//, "");
 }
 
-function formatProjectLabel(event: GitlabActivityEvent): string {
+function formatProjectLabel(event: GitlabActivityEvent, baseUrl: string): string {
+	if (event.projectName && event.projectWebUrl) {
+		return `[${event.projectName}](${event.projectWebUrl})`;
+	}
+
 	if (event.projectName) {
-		return `**${event.projectName}**`;
+		return event.projectName;
+	}
+
+	if (event.projectWebUrl) {
+		return `[project](${event.projectWebUrl})`;
 	}
 
 	if (event.projectId !== undefined) {
-		return `project #${event.projectId}`;
+		const normalizedBaseUrl = baseUrl.replace(/\/+$/, "");
+		return `[project](${normalizedBaseUrl}/projects/${event.projectId})`;
 	}
 
 	return "unknown project";
@@ -66,49 +75,22 @@ function formatTargetLabel(event: GitlabActivityEvent, baseUrl: string): string 
 	return `“${titleText}”`;
 }
 
-function formatPushDetails(event: GitlabActivityEvent): string[] {
-	if (!event.pushData) {
-		return [];
-	}
-
-	const pushLines: string[] = [];
-	const ref = event.pushData.ref ? stripRefPrefix(event.pushData.ref) : null;
-	const commitCount = event.pushData.commit_count;
-	const commitTitle = event.pushData.commit_title;
-
-	if (ref) {
-		pushLines.push(`  - Branch: \`${ref}\``);
-	}
-
-	if (typeof commitCount === "number") {
-		pushLines.push(`  - Commits in push: ${commitCount}`);
-	}
-
-	if (commitTitle) {
-		pushLines.push(`  - Latest commit title: ${commitTitle}`);
-	}
-
-	if (pushLines.length === 0) {
-		pushLines.push("  - Commit details were not provided by the events API payload.");
-	}
-
-	return pushLines;
-}
-
-function formatEventLine(event: GitlabActivityEvent, baseUrl: string): string[] {
-	const eventLines: string[] = [];
+function formatEventLine(event: GitlabActivityEvent, baseUrl: string): string {
 	const timeText = formatTime(event.createdAt);
+	const projectLabel = formatProjectLabel(event, baseUrl);
+
+	if (event.pushData) {
+		const commitMessage = event.pushData.commit_title?.trim() || "Commit message unavailable";
+		const username = event.authorUsername ? `@${event.authorUsername}` : "Unknown user";
+		const branch = event.pushData.ref ? stripRefPrefix(event.pushData.ref) : "unknown branch";
+		return `- ${timeText} - **${commitMessage}** - ${username} pushed to ${projectLabel} in ${branch}`;
+	}
+
 	const actionText = event.actionName || "did";
 	const targetLabel = formatTargetLabel(event, baseUrl);
-	const projectLabel = formatProjectLabel(event);
-	const authorText = event.authorUsername ? ` by @${event.authorUsername}` : "";
+	const username = event.authorUsername ? `@${event.authorUsername}` : "Unknown user";
+	return `- ${timeText} - ${username} ${actionText} in ${projectLabel} (${targetLabel})`;
 
-	eventLines.push(`- ${timeText} • ${actionText}${authorText} in ${projectLabel} (${targetLabel})`);
-
-	const pushDetails = formatPushDetails(event);
-	eventLines.push(...pushDetails);
-
-	return eventLines;
 }
 
 export function formatActivitiesMarkdown(params: FormatActivitiesMarkdownParams): string {
@@ -127,7 +109,7 @@ export function formatActivitiesMarkdown(params: FormatActivitiesMarkdownParams)
 	];
 
 	for (const event of params.events) {
-		lines.push(...formatEventLine(event, params.baseUrl));
+		lines.push(formatEventLine(event, params.baseUrl));
 	}
 
 	return lines.join("\n");
