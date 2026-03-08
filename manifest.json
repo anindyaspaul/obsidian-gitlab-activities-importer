@@ -1,11 +1,11 @@
 {
-	"id": "sample-plugin",
-	"name": "Sample Plugin",
+	"id": "obsidian-gitlab-activities-importer",
+	"name": "Obsidian GitLab Activities Importer",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "Demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
+	"description": "Imports GitLab daily activities into the active Obsidian daily note.",
+	"author": "Anindya Sundar Paul",
+	"authorUrl": "https://anindyaspaul.com",
+	"fundingUrl": "https://buymeacoffee.com/aspaul",
 	"isDesktopOnly": false
 }

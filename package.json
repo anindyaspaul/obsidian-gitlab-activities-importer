@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-sample-plugin",
+	"name": "obsidian-gitlab-activities-importer",
 	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"description": "Import GitLab activities into Obsidian daily notes",
 	"main": "main.js",
 	"type": "module",
 	"scripts": {
