@@ -3,9 +3,9 @@
 	"name": "Obsidian GitLab Activities Importer",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "Imports GitLab daily activities into the active Obsidian daily note.",
+	"description": "Imports GitLab daily activities into the active daily note.",
 	"author": "Anindya Sundar Paul",
 	"authorUrl": "https://anindyaspaul.com",
-	"fundingUrl": "https://buymeacoffee.com/aspaul",
+	"fundingUrl": "https://buymeacoffee.com/anindyaspaul",
 	"isDesktopOnly": false
 }
