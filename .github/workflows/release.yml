@@ -1,23 +1,20 @@
-name: Build and release
+name: Release
+
 on:
-  push:
-    branches: ["**"]
-  pull_request:
-    branches: ["**"]
   workflow_dispatch:
 
-permissions:
-  contents: read # for checkout
-
 jobs:
-  build:
-    name: Build
+  release:
+    name: Release
     runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: [20.x, 22.x]
+    if: github.event_name == 'workflow_dispatch'
     permissions:
-      contents: read
+      contents: write # to be able to publish a GitHub release
+      issues: write # to be able to comment on released issues
+      pull-requests: write # to be able to comment on released pull requests
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,43 +31,10 @@ jobs:
         run: npm run lint
       - name: Build
         run: npm run build --if-present
-      - name: Upload built main.js
-        if: github.event_name != 'pull_request' && matrix.node-version == '22.x'
-        uses: actions/upload-artifact@v4
-        with:
-          name: main-js-dist
-          path: main.js
-          if-no-files-found: error
-          retention-days: 7
-
-  release:
-    name: Release
-    runs-on: ubuntu-latest
-    needs: build
-    if: github.event_name == 'workflow_dispatch'
-    permissions:
-      contents: write # to be able to publish a GitHub release
-      issues: write # to be able to comment on released issues
-      pull-requests: write # to be able to comment on released pull requests
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "lts/*"
-      - name: Install dependencies
-        run: npm clean-install
       - name: Verify the integrity of provenance attestations and registry signatures for installed dependencies
         run: npm audit signatures
-      - name: Download built main.js
-        uses: actions/download-artifact@v4
-        with:
-          name: main-js-dist
-          path: .
       - name: Release
+        if: matrix.node-version == '22.x'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npx semantic-release
