@@ -10,8 +10,8 @@ permissions:
   contents: read # for checkout
 
 jobs:
-  verify:
-    name: Build and lint
+  build:
+    name: Build
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -30,10 +30,10 @@ jobs:
           cache: "npm"
       - name: Install dependencies
         run: npm ci
-      - name: Build
-        run: npm run build --if-present
       - name: Lint
         run: npm run lint
+      - name: Build
+        run: npm run build --if-present
       - name: Upload built main.js
         if: github.event_name != 'pull_request' && matrix.node-version == '22.x'
         uses: actions/upload-artifact@v4
@@ -46,7 +46,7 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    needs: verify
+    needs: build
     if: github.event_name == 'workflow_dispatch'
     permissions:
       contents: write # to be able to publish a GitHub release
