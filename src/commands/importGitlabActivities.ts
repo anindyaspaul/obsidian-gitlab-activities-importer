@@ -32,7 +32,7 @@ export async function importGitlabActivitiesIntoActiveNote(plugin: GitLabActivit
 
 	const parsedDate = extractDailyNoteDateFromBasename(activeView.file.basename);
 	if (!parsedDate) {
-		new Notice("Could not determine date from note title. Expected YYYY-MM-DD or YYYYMMDD in the file name.");
+		new Notice("Could not determine the date from the note title. Use a file name like 2026-03-14 or 20260314.");
 		return;
 	}
 

@@ -42,9 +42,9 @@ export class GitLabActivitiesImporterSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Personal access token")
-			.setDesc("Token used with PRIVATE-TOKEN header. Minimum required scope: read_user.")
+			.setDesc("Token used with the private-token header. Minimum required scope: read_user.")
 			.addText(text => {
-				text.setPlaceholder("glpat-...")
+				text.setPlaceholder("Paste token")
 					.setValue(this.plugin.settings.personalAccessToken)
 					.onChange(async (value) => {
 						this.plugin.settings.personalAccessToken = value.trim();
