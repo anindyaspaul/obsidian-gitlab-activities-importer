@@ -1,7 +1,7 @@
 {
 	"id": "gitlab-activities-importer",
 	"name": "GitLab Activities Importer",
-	"version": "1.0.1",
+	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
 	"description": "Imports GitLab daily activities into the active daily note.",
 	"author": "Anindya Sundar Paul",

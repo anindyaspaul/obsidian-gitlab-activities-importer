@@ -1,16 +1,35 @@
 {
-  "plugins": [
-    "@semantic-release/commit-analyzer",
-    "@semantic-release/release-notes-generator",
-    [
-      "@semantic-release/github",
-      {
-        "assets": [
-          { "path": "styles.css", "label": "CSS distribution" },
-          { "path": "main.js", "label": "JS distribution" },
-          { "path": "manifest.json", "label": "Manifest file" }
+    "tagFormat": "${version}",
+    "preset": "conventionalcommits",
+    "assets": [],
+    "plugins": [
+        [
+            "@semantic-release/commit-analyzer", {
+                "releaseRules": [
+                    { "type": "chore", "release": "patch" }
+                ]
+            }
+        ],
+        [
+            "@semantic-release/release-notes-generator", {
+                "presetConfig": {
+                    "types": [
+                        { "type": "feat", "section": ":sparkles: New Features" },
+                        { "type": "fix", "section": ":bug: Bug Fixes" },
+                        { "type": "chore", "section": ":wrench: Miscellaneous Chores" }
+                    ]
+                }
+            }
+        ],
+        [
+            "@semantic-release/github",
+            {
+                "assets": [
+                    { "path": "styles.css", "label": "CSS distribution" },
+                    { "path": "main.js", "label": "JS distribution" },
+                    { "path": "manifest.json", "label": "Manifest file" }
+                ]
+            }
         ]
-      }
     ]
-  ]
-}
+}  
