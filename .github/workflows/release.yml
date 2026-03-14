@@ -40,4 +40,6 @@ jobs:
         if: matrix.node-version == '22.x'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx semantic-release
+        run: |
+          npm install -g conventional-changelog-conventionalcommits
+          npx semantic-release
